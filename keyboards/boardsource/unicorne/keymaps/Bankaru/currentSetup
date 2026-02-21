@@ -1,0 +1,15 @@
+What we made default:
+
+config_circuit.h -> config.h
+
+keymap_circuit.c -> keymap.c
+
+rgb_matrix_user_simple.inc -> as named.
+
+rules_circuit.mk -> rules.mk
+
+rgb_matrix_user.h -> it itself is already changed...no going back.
+
+
+
+

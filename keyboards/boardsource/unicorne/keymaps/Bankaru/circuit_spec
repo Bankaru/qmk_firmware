@@ -1,0 +1,81 @@
+Create the C code for a qmk rgb matrix effect "color connection"
+
+Keyboard:  Boardsource Unicorne
+
+The default state of all keys is to be unlit.
+Each full row of keys has a unique "theme color".
+
+Definitions:
+First (Top) row. Theme color: Orange
+Second Row. Theme color: Green
+Third Row. Theme Color: Blue
+Bottom Row. none.
+
+"Inside"
+The direction laterally towards the gap between the two halves of the Unicorne keyboard.
+
+"Outside"
+The direction laterally away from the gap between the two halves of the Unicorne keyboard.
+
+"Pinky-column"
+On each side of the keyboard, on any row except the bottom, the column that the pinky finger rests on in home row position.
+
+"Index finger-column"
+On each side of the keyboard, on any row except the bottom, the column that the index finger rests on in home row position.
+
+"Middle finger-column"
+On each side of the keybaord, on any row except the bottom, the column that the middle finger rests on in home row position.
+
+"Ring finger-column"
+On each side of the keyboard, on any row except the bottom, the column that the ring finger rests on in home row position.
+
+"Outer-most key"
+On each side of the keyboard, on any row except the bottom, the outer-most key is the key one column to the outside of the Pinky-column.
+
+"Inner-most key"
+On each side of the keyboard, on any row except the bottom, the inner-most key is the key one column to the inside of the index finger column.
+
+The outermost (near the pinkies) keys of each row do not participate in the effect, and should therefore always be unlit.
+
+"Source Keys"
+On each side of the keyboard, on each row except the bottom, the inner most key and the Pinky-column key are "source" keys.
+
+"Connection Keys"
+On each side of the keyboard, on each row except the bottom, the 3 keys in between the source keys.
+
+"Circuit"
+The Source and connection keys of a row on one half of the keyboard.
+There are 6 Circuits.
+
+"Circuit Complete"
+The final stage of the effect.
+
+The Effect:
+The color circuit effect is based on making the illusion that pressing Connection keys completes a circuit.
+The effect happens on a per Circuit Basis.
+If I mention a connection key's sources, it means specifically the two source keys of it's Circuit.
+The effect can happen on multiple rows per half, and on multiple halves at a time.  It just depends on which keys are being pressed, according to the below rules.
+
+When a Source Key is pressed the Source key itself lights up in white light, and stays illuminated until released, or until Circuit Complete.
+When a Connection key is pressed, both of its Source Keys light up in white, and stay white until released, or Circuit complete.
+When a Connection key is held, for each 150 ms it is held, the next unlit Connection keys light up in white from the direction of the two sources towards each other.
+
+Example 1:  The Middle finger-column is pressed and held:
+1. Immediately the Source keys of that Circuit are lit in white.
+2. After 150 ms, the Ring finger-column key is lit in white because it is the next unlit key from the Outside Source.
+Also, the Index finger-column key is lit in white because it is the next unlit key from the Inside source.
+3. After another 150 ms, right Middle finger-column key is lit in white, because it is the next unlit key from a Source. (In this is case, it is the next unlit key from both Sources.)
+3. Now, all keys of the Circuit are lit in white.  After 150 ms, the "Circuit Complete" will happen.
+All the keys of the Circuit will glow in the theme color of the row, slowly becoming slightly brighter and then slightly dimmer until the key is released.
+
+Example 2: The Index finger-column key is pressed and held:
+1. Immediately, the source keys of the Circuit are illuminated in white.
+2. After 150 ms, the Ring finger-column key will light up in white because it is the next unlit connection key from the Outside source.
+Also, the Index finger-column key is will light up in white because it is the next unlit key from the Inside source.
+3. After another 150 ms, the Middle finger-column key will light up, because it is the next unlit key from a Source.
+4. Now all Keys are lit up. After another 150 ms, "Circuit Complete" will happen.
+All the keys of the Circuit will glow in the theme color of the row, slowly becoming slightly brighter and then slightly dimmer until the key is released.
+
+If connection keys in different circuits are pressed at the same time, each circuit should have its own effect begin to execute.
+
+The Outer-most keys do not participate in the Circuit.  However, when they are pressed, they should light up in theme color for the duration of their being held on an individual basis.

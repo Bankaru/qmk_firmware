@@ -1,0 +1,44 @@
+process_user will send the uint8_t of the led.
+
+
+you can have that information stored in either:
+    an array of bools.  one for each led code.
+    then, you have each circuit have an array of its members.
+        everytime the method runs, the circuits check the bool array to
+        see if they are active or not, and process accordingly
+
+    a uint8_t mask of the active codes on each circuit.
+    then, you must translate the led code into the mask of the circuit.
+        this means you need a decoding method that translates the
+        led uint8_t into:
+            circuit index, and
+            the finger position, 0 through 5.
+
+
+If you RAM is not a problem, use the array because it is simpler.
+    Array:
+        54 bits (probably rounds up to 64 bits) for the array.
+        For each circuit:
+            48 bits for the array of indices.
+            16 bits for the timer;
+            1 bits for an "active" boolean.
+            1 bits for a "complete" boolean.
+        Total:  68 * 6 + 54. 462 ish.
+        For processing, its direct array access.
+        You need to check 3 bools everytime an event happens.
+            Maybe the compiler makes that easy, I don't know.
+        Easier to write.
+
+    Masks:
+        16 bits for the timer.
+        8 bits for the flags.
+        1 bit for an "active" boolean
+        1 bit for a "complete" boolean.
+
+        But you need to translate led index to and from a bitmask via a switch statement.
+        You can just "&" the mask parts to know if it should be active or not.
+            active = ring & mid & index != 0.
+
+        Funner to write.  haha.
+If processing is not a problem, use the masks because there is less data.
+
