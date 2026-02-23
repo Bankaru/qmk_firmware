@@ -57,41 +57,6 @@ enum layers {
     _SYST,
 };
 
-enum custom_keycodes {
-    MY_SYST = SAFE_RANGE,
-    MY_BASE,
-    MY_COPY,
-    MY_CUT,
-    MY_PASTE,
-#ifdef VIM_MOTIONS
-	//Maybe you should make functions you can't do like "till" be useful F functions -rename symbol, debug step...
-	VI_W,
-	VI_E, //This won't be usable since sometimes ctrl + right has a space after the word and sometimes it doesn't.
-	VI_R,
-	//VI_T, Use for something else
-	VI_Y,
-	VI_U,
-	VI_O,
-	VI_P,
-	VI_A,
-	VI_S,
-	VI_D,
-	//VI_F, how to make find?
-	VI_G,
-	VI_H, //I use this as insert.
-	//VI_;, how to make repeat?  or go next?  Can't really use commands here...  Unless you  make a helper program.  DON'T DO IT.
-	VI_Z, //I don't even know what this is or how to use it. ZZ saves and quits, ZQ quits without saving.
-	VI_X,
-	VI_C,
-	VI_V,
-	VI_B,
-	//VI_N, how to make next?
-	//VI_M, I don't know what this does or if i can do it.  I think it just centers the screen?
-	//VI_,  Can't really reverse t or f..
-	//VI_.  Can't really repeat cmd...
-	//VI_/  Can't really do search other than ctrl f and see what happens...  might not be a bad idea i guess.
-#endif
-};
 
 
 #ifdef VIM_MOTIONS
@@ -147,13 +112,15 @@ static uint16_t      press_timer;
 static keypos_t      reset_key_pos;
 
 static uint16_t copy_timer;
-
+key_release_mask_t key_release_mask;
 //uint16_t my_td_timer; not needed if I use the builtin tap dance.
 //VIM Variables
 // static bool replace_char = false;
 // static bool replace_cont = false;
 // static bool cmd_change = false;
 
+uint8_t saved_mods;
+uint8_t saved_weak_mods;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	uint8_t led = g_led_config.matrix_co[record->event.key.row][record->event.key.col];
@@ -175,6 +142,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
     }
 	
+	saved_mods = get_mods();
+	//saved_weak_mods = get_weak_mods();
+
     switch (keycode) {
         case MY_BASE: 
             if (record->event.pressed) {
@@ -246,25 +216,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		
 #ifdef VIM_MOTIONS
 		case VI_W:
-		w_vim_key(record->event.pressed);
+		return w_vim_key(record->event.pressed);
 
 		case VI_R:
-		r_vim_key(record->event.pressed);
+		return r_vim_key(record->event.pressed);
 			
 		case VI_U:
-		u_vim_key(record->event.pressed);
+		return u_vim_key(record->event.pressed);
 
 		case VI_O:
-		o_vim_key(record->event.pressed);
+		return o_vim_key(record->event.pressed);
 
 		case VI_P:
-		p_vim_key(record->event.pressed);	
+		return p_vim_key(record->event.pressed);	
 
 			
 #endif
    case MY_SYST:
             if (record->event.pressed) {
-                if ((get_mods() & MOD_MASK_CTRL) && (get_mods() & MOD_MASK_ALT)) {
+                if ((saved_mods & MOD_MASK_CTRL) && (saved_mods & MOD_MASK_ALT)) {
                     if (!layer_state_is(_SYST)) {
                         layer_on(_SYST);
 #ifdef AUDIO_ENABLE

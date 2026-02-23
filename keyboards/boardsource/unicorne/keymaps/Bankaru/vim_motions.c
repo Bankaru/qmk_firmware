@@ -1,178 +1,115 @@
-#ifdef VIM_MOTIONS
-#include "action_util.h"
-#include "keycodes.h"
-#include "modifiers.h"
 #include "vim_motions.h"
+#include "custom_keycodes.h"
 #include "my_keymap.h"
-#include QMK_KEYBOARD_H
+#include "quantum/action_util.h"
 
-command_mask_t active_vim_commands;
-//my_tap_dance_t curr_tap_dance;
-
-void init_vim_motions(void){
-	active_vim_commands = 0;
-	//memset(&curr_tap_dance, 0, sizeof(curr_tap_dance));
+static static void b_o_w() {
+	tap_code16(LCTL(KC_RGHT);
+	tap_code16(LCTL(KC_LEFT);
 }
 
-bool w_vim_key(bool down) {
-	if (down) {
-		tap_code16(LCTL(KC_RIGHT));
-				return false;
-		} else {
-	return true;
+//actually, this should be switching on an enum, not the keycode.
+void execute_motion(uint16_t keycode, uint8_t number) {
+	switch (keycode) {
+		case VI_W:
+			next_word(number);
+			break;
+		case VI_B:
+			prev_word(number);
+			break;
+		case VI_J:
+			left_col(number);
+			break;
+		case VI_K:
+			down_row(number);
+			break;
+		case VI_I:
+			up_row(number);
+			break;
+		case VI_L:
+			right_col(number);
+			break;
 	}
 }
-//skip key E, because there is no E functionality generic to most programs.
 
-bool r_vim_key(bool down) {
-	if (!down) {
-		return true;
+void execute_shift_motion(uint16_t keycode, uint8_t number) {
+	switch (keycode) {
+		case VI_I:
+			page_up();
+			break;
+		case VI_J:
+			soft_bol();
+			break;
+		case VI_K:
+			page_down();
+			break;
+		case VI_L:
+			eol();
 	}
-	if (get_mods() & MOD_MASK_SHIFT) {
-		// this is probably not worth it.  Too hard to use, and not used often.
-		//active_vim_commands |= INS_IS_ACTIVE;//not sure i even need to track this since i just go to the default level
-		//tap_code(KC_INS);
-		//layer_clear();
-		return true;
-	}
-	tap_code16(S(KC_RGHT));
-	tap_code(KC_LEFT);
-	layer_clear();
-	return false;
 }
 
-// bool y_vim_key(bool down) {
-// 	if (!down) {
-// 		return true;
-// 	}
-// 	if (my_tap_dance_mask & VI_TD_Y) {
-// 		if (timer_elapsed(my_td_timer < TAPPING_TERM) {
-// 			yank_line();
-// 			my_tap_dance_mask &= ~0xFF;
-// 			return false;
-// 		}
-// 	} else {How do you tell the tap dance which keypress it is looking out for?  Is it based on its location in the 
-// 	//this tap dancing won't work correctly because the other commands will be sent first.
-// 	//I have to wait until tapping term is passed to send.
-// 	//However, you cannot have it send after a time period because process record user
-// 	//only fires when typed.
-// 	//you would have to start a coroutine, which you're not going to get into.
-// 	//So built in tap_dance functionality is the only choice.
-// 	if (get_mods() & MOD_MASK_SHIFT) {
-// 		my_tap_dance_mask |= VI_TAP_DANCE_Y;
-// 		timer.read(my_tap_dance_timer);
-// 		tap_code16(S(KC_END));
-// 		tap_code16(C(KC_C));//how will you handle terminals...Delay like before?
-// 		tap_code(KC_LEFT);
-// 		return false;
-// 	}
-//
-// 	my_tap_dance_mask |= VI_TAP_DANCE_Y;
-// 	tap_code16(C(KC_C));
-// 	return false;
-// }
-void tap_dance_VI_Y(tap_dance_state_t *state, void *user_data) {
-	if (state->count > 1) {
-		yank_line();
+static void left_col(uint8_t number, bool select) {
+	if (select){
+		add_weak_mods(MOD_BIT(KC_LSHIFT));
+		send_keyboard_report();
+			for (uint8_t i = 1; i <= number; i++) {
+			tap_code(KC_LEFT);
+			}
+		set_weak_mods(saved_weak_mods);
 	} else {
-		if (get_mods() & MOD_MASK_SHIFT) {
-			yank_to_eol();
-		} else {
-			tap_code16(C(KC_C));
-		}
-	}
-}
-void yank_to_eol() {
-	// uint8_t saved_mods = get_mods();
-	// clear_mods();
-	// clear_oneshot_mods();
-	//
-	// register_code(KC_LSFT);
-	 tap_code(KC_END); //this is sub ideal, but you can't un shift a shifted.
-	// unregister_code(KC_LSFT);
-	// 
-	// tap_code16(C(KC_C));
-	// tap_code(KC_LEFT);
-	// tap_code(KC_RIGHT);
-	//
-	// set_mods(saved_mods);
-}
-
-void yank_line(void) {
-	tap_code(KC_HOME);
-	tap_code16(S(KC_END));
-	tap_code16(C(KC_C));  //how will you handle terminals...3x tap?
-	tap_code(KC_LEFT);
-}
-
-void yank(void) {
-	if (get_mods() & MOD_MASK_SHIFT) {			//yank to eol
-		tap_code16(S(KC_END));
-		tap_code16(C(KC_C));//how will you handle terminals...3x tap?
+		for (uint8_t i = 1; i <= number; i++) {
 		tap_code(KC_LEFT);
-	} else {									//yank selected
-		tap_code16(C(KC_C));
-	}
-}
-
-bool u_vim_key(bool down) {
-	if (!down) {
-		return true;
-	}
-	tap_code16(C(KC_Z));
-	return false;
-}
-
-bool o_vim_key(bool down) {
-	if (down) {
-		if (get_mods() & MOD_MASK_SHIFT) {
-			tap_code(KC_HOME);
-			tap_code(KC_ENT);
-			tap_code(KC_UP);
-			return false;
 		}
-		tap_code(KC_DOWN);
-		tap_code(KC_HOME);
-		tap_code(KC_ENT);
-		tap_code(KC_UP);
-		tap_code(KC_HOME);
-		return false;
-	} else {
-	if (get_mods() & MOD_MASK_SHIFT) {
-		tap_code(KC_HOME);
-		tap_code(KC_ENT);
-		tap_code(KC_UP);
-		return false;
 	}
+}
 
-	tap_code(KC_DOWN);
-	tap_code(KC_HOME);
-	tap_code(KC_ENT);
+static void up_row(uint8_t number) {
+	for (uint8_t i = 1; i <= number; i++) {
 	tap_code(KC_UP);
+	}
+}
+
+static void down_row(uint8_t number) {
+	for (uint8_t i = 1; i <= number; i++) {
+	tap_code(KC_DOWN);
+	}
+}
+
+static void right_col(uint8_t number) {
+	for (uint8_t i = 1; i <= number; i++) {
+	tap_code(KC_RGHT);
+	}
+}
+
+
+static void prev_word(uint8_t number) {
+	//get to the start of the word.
+	b_o_w();
+	for (uint8_t i = 1; i <= number; i++) {
+		tap_code16(LCTL(KC_LEFT);
+	}
+}
+
+static void next_word(uint8_t number) {
+	//get to the start of the word.
+	b_o_w();
+	for (uint8_t i = 1; i <= number; i++) {
+		tap_code16(LCTL(KC_RGHT);
+	}
+}
+
+static void soft_bol(uint8_t number) {
 	tap_code(KC_HOME);
-	return false;
-	}
 }
 
-bool p_vim_key (bool down) {
-	if (!down) {
- 		return true;
-	}
-
-	if (get_mods() & MOD_MASK_SHIFT) {
-		tap_code(KC_UP);
-		tap_code(KC_HOME);
-		tap_code(KC_ENT);
-		tap_code(KC_UP);
-		tap_code16(C(KC_V));
-		return false;
-	}
-
-	tap_code16(C(KC_V));
-	return false;
+static void eol(uint8_t number) {
+	tap_code(KC_END);
 }
-#endif
-			
-	
 
+static void page_up(uint8_t number) {
+	tap_code(KC_PGUP);
+}
 
+static void page_down(uint8_t number) {
+	tap_code(KC_PGDN);
+}

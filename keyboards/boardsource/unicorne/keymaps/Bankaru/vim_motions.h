@@ -4,6 +4,16 @@
 typedef uint8_t command_mask_t;
 extern command_mask_t active_vim_commands;
 
+typedef uint8_t key_release_mask_t;
+extern key_release_mask_t key_release_mask;
+
+//the bool returned determines if the operator immediately executes
+//or if they...wait they all immediately execute.
+
+enum {
+	RL_VI_Y = 1 << 0,
+	RL_VI_P = 1 << 1,
+} KEY_RELEASE_TRACKER;
 
 enum {
 	VI_TAP_DANCE_Y = 1 << 0,

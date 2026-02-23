@@ -1,2 +1,23 @@
-Every good boy does or doesn't do high-speed fine.
-Okay so now are we working?  Very good.  Very good indeed.
+New control flow:
+
+Vim Engine
+Checked every frame in the one that does
+matrix scan user.
+You can set in process record user.
+Then process the outcomes in matrix scan.
+
+
+
+
+
+
+how ithe function works.
+
+start command
+maintain it across motions
+    maintain motions across number
+execute command
+
+To use function pointers in c, can you do something like this?
+
+typedef execute_command
