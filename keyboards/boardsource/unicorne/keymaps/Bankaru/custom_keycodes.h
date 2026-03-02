@@ -1,10 +1,13 @@
-
+#include "quantum_keycodes.h"
 enum custom_keycodes {
     MY_SYST = SAFE_RANGE,
     MY_BASE,
     MY_COPY,
     MY_CUT,
     MY_PASTE,
+#ifdef MY_TAPS
+	TP_SYM,
+#endif
 #ifdef VIM_MOTIONS
 	//I'll just use my symbols to make it less complicated for now...jikl instead of hjkl
 	//Maybe you should make functions you can't do like "till" be useful F functions -rename symbol, debug step...

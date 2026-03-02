@@ -18,7 +18,7 @@ AUDIO_ENABLE = yes
 CONSOLE_ENABLE = yes
 
 # Additional source files for circuit effect
-SRC += vim_motions.c
+#SRC += vim_motions.c
 SRC += lib/oled.c
 
 # Optional: Debug configuration for circuit effect development

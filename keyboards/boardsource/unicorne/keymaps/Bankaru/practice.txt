@@ -21,3 +21,16 @@ execute command
 To use function pointers in c, can you do something like this?
 
 typedef execute_command
+k
+
+tapdance cannot be used for 0 / MY_SYM.  _whatever.  I probably want this to be
+
+my_taps:
+tap_timer:
+
+ZERO_SYM:
+tap once for to toggle to _SYM
+tap and hold for move to _SYM
+tap twice for a KC_0.
+If shift is held on the second tap you get KC_KP_0
+

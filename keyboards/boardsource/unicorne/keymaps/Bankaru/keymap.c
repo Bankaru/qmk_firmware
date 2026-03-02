@@ -1,4 +1,5 @@
 #include "keycodes.h"
+#include "custom_keycodes.h"
 #include "keymap_us.h"
 #include "process_key_override.h"
 #include "process_combo.h"
@@ -6,6 +7,7 @@
 #include "timer.h"
 #include "rgb_matrix_user.h"
 #include "my_keymap.h"
+#include "my_taps.h"
 #ifdef VIM_MOTIONS
 #	include "vim_motions.h"
 #endif
@@ -58,16 +60,22 @@ enum layers {
 };
 
 
-
-#ifdef VIM_MOTIONS
+//tap dance
 enum {
+	TD_0,
+	TD_UNDS,
+#ifdef VIM_MOTIONS
 	TD_VI_Y,
+#endif
 };
 
 tap_dance_action_t tap_dance_actions[] = {
+	[TD_0] = ACTION_TAP_DANCE_DOUBLE(MY_SYM, KC_0),
+	[TD_UNDS] = ACTION_TAP_DANCE_DOUBLE(KC_LGUI, KC_UNDS),
+#ifdef VIM_MOTIONS
 	[TD_VI_Y] = ACTION_TAP_DANCE_FN(tap_dance_VI_Y),
-};
 #endif
+};
 
 layer_state_t layer_state_set_user(layer_state_t state) {
     if (layer_state_cmp(state, _SYM)) {
@@ -80,11 +88,9 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
 const uint16_t PROGMEM sym_space_combo[] = {MY_SYM, KC_SPC, COMBO_END};
 const uint16_t PROGMEM nav_space_combo[] = {MY_NAV, KC_SPC, COMBO_END};
-const uint16_t PROGMEM shift_sym_combo[] = {MY_SHFT, MY_SYM, COMBO_END};
 combo_t key_combos[] = {
     COMBO(sym_space_combo, KC_UNDS),
     COMBO(nav_space_combo, KC_TAB),
-	COMBO(shift_sym_combo, KC_0),	//I don't like this. Better off without it.
 };
 
 const key_override_t shift_0 = ko_make_basic(MOD_MASK_SHIFT, KC_0, KC_KP_0);
@@ -112,9 +118,11 @@ static uint16_t      press_timer;
 static keypos_t      reset_key_pos;
 
 static uint16_t copy_timer;
-key_release_mask_t key_release_mask;
 //uint16_t my_td_timer; not needed if I use the builtin tap dance.
+//VIM_TYPES
+//key_release_mask_t key_release_mask;//not needed i think...
 //VIM Variables
+//
 // static bool replace_char = false;
 // static bool replace_cont = false;
 // static bool cmd_change = false;
@@ -133,6 +141,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		}
 	}
 
+#ifdef MY_TAPS
+	process_my_taps(keycode, record);
+#endif
+	
     // Detect other keys while the reset key is physically held
     if (is_active && !(record->event.key.row == reset_key_pos.row && record->event.key.col == reset_key_pos.col) &&
         record->event.pressed) {
@@ -259,6 +271,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 void matrix_scan_user(void) {
+	process_my_tap_timing();
+
     if (is_active) {
         if (!matrix_is_on(reset_key_pos.row, reset_key_pos.col)) {
             // Physical release detected
@@ -280,7 +294,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {[_BASE] = LAYOUT_s
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,             KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
 		KC_ESC,  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,             KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
 		MY_NAV,  KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,  		   KC_N, 	KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_ENT,
-								   KC_LCTL, KC_LGUI, MY_SHFT,		   KC_SPC, MY_SYM, KC_LALT),
+								   KC_LCTL, TD(TD_UNDS), MY_SHFT,	   KC_SPC,  TP_SYM, KC_LALT),
     //    [_SYM] = LAYOUT_split_3x6_3(
     // |........|........|........|........|........|........|........|........|........|........|........|........|........|........|
     //  _______, KC_LCBR, KC_LBRC, KC_LPRN, KC_PIPE, KC_PERC,          KC_CIRC, KC_AMPR, KC_RPRN, KC_RBRC, KC_RCBR, _______, 
@@ -310,7 +324,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {[_BASE] = LAYOUT_s
 #elif defined(VIM_MOTIONS) 
         [_NAV] = LAYOUT_split_3x6_3(				//can't do find or till...
      //|........|........|........|........|........|........|........|........|........|........|........|........|........|........|
-        _______, KC_F1,   VI_W,  VI_E,    VI_R,    KC_F5,   	   TD(TD_VI_Y), VI_U,    KC_UP,   VI_O,    VI_P,    _______,
+        _______, KC_F1,   VI_W,  VI_E,    VI_R,    KC_F5,   	   /* TD(TD_VI_Y) */, VI_U,    KC_UP,   VI_O,    VI_P,    _______,
 		MY_BASE, VI_A,    VI_S,    VI_D,    KC_F9,   KC_F10, 		   KC_INS,  KC_LEFT, KC_DOWN, KC_RGHT, KC_SCRL, MY_SYST, 
 		_______, _______,   VI_X,    VI_C, 	VI_V,	 VI_B, 			   _______, _______, _______, _______, _______, _______,
 		                           _______, _______, _______, 		   _______, MY_NVSY, _______),
