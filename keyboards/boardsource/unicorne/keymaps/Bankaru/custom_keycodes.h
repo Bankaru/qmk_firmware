@@ -1,4 +1,13 @@
 #include "quantum_keycodes.h"
+
+enum layers {
+    _BASE,
+    _SYM,
+    _NAV,
+    _NVSY,
+    _SYST,
+};
+
 enum custom_keycodes {
     MY_SYST = SAFE_RANGE,
     MY_BASE,

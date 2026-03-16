@@ -51,13 +51,6 @@ float tone_exit[][2]  = SONG(MUSIC_ON_SOUND);
 #define MY_NVSY LT(_NVSY, KC_NO)
 #define MY_SHFT MT(MOD_LSFT, KC_CAPS)
 
-enum layers {
-    _BASE,
-    _SYM,
-    _NAV,
-    _NVSY,
-    _SYST,
-};
 
 
 //tap dance
@@ -141,9 +134,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		}
 	}
 
-#ifdef MY_TAPS
-	process_my_taps(keycode, record);
-#endif
 	
     // Detect other keys while the reset key is physically held
     if (is_active && !(record->event.key.row == reset_key_pos.row && record->event.key.col == reset_key_pos.col) &&
@@ -153,6 +143,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             layer_clear();
         }
     }
+
+#ifdef MY_TAPS
+	return process_my_taps(keycode, record);
+#endif
 	
 	saved_mods = get_mods();
 	//saved_weak_mods = get_weak_mods();
