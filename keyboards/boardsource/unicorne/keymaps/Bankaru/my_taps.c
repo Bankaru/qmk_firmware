@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "custom_keycodes.h"
 #include "my_taps_data.h"
+#include "my_taps.h"
 #include QMK_KEYBOARD_H
 
 bool my_tap_held = false;
@@ -94,7 +95,7 @@ void process_my_tap_timing(void) {
         //so it should fire if it is held the held effect should take place.
         //held effect should either be repeating or a different function should fire.
 		//That is handled in do_my_taps_action.
-        completed = do_my_taps_action(active_tap_index, taps);
+        completed = do_my_taps_action(active_my_tap, taps);
 		if (completed) {
 			clean_up_taps();
 		}
@@ -102,7 +103,7 @@ void process_my_tap_timing(void) {
 	}
 
 	if (taps == 2 && timer_elapsed(my_taps_timer) > TAPPING_TERM) {
-		completed = do_my_taps_action(active_tap_index, taps);
+		completed = do_my_taps_action(active_my_tap, taps);
 
 		if (completed) {
 			clean_up_taps();
@@ -112,11 +113,6 @@ void process_my_tap_timing(void) {
         //if its not a double tap hold, it will be processed on On Release.
 	}
 }
-
-void process_my_tap_release() {
-
-}
-
 
 
 #endif

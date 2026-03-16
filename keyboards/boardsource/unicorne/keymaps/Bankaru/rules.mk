@@ -19,6 +19,8 @@ CONSOLE_ENABLE = yes
 
 # Additional source files for circuit effect
 #SRC += vim_motions.c
+SRC += my_taps.c
+SRC += my_taps_data.c
 SRC += lib/oled.c
 
 # Optional: Debug configuration for circuit effect development
