@@ -17,8 +17,10 @@ typedef struct {
 extern uint8_t active_tap_index;
 extern uint8_t keycode_to_my_tap(uint16_t);
 extern my_tap_t my_taps[];
+extern bool my_taps_interrupt;
 extern bool repeat_started;
 extern bool mod_active;
+extern void do_my_taps_down_action(uint8_t index, uint8_t taps);
 extern bool do_my_taps_action(uint8_t index, uint8_t taps);
 extern void do_my_taps_release_action(uint8_t index, uint8_t taps);
 enum uint8_t {

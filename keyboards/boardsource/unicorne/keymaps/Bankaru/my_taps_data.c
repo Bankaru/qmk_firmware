@@ -28,62 +28,63 @@ uint16_t delay_times[2] = {
 // We should only arrive at this function when the timer has exceeded TAPPING_TERM after a tap
 // the bool says if the action is completed or not.
 // repeatable actions will be false (not completed) until my_tap_held is no longer true.
+
+void do_my_taps_down_action(uint8_t index, uint8_t taps) {
+	switch (index) {
+		case ZERO_SYM:
+	  		if (taps == 0) {
+		  		layer_on(_SYM);
+				mod_active = true;
+			}
+	}
+}
+
 bool do_my_taps_action(uint8_t index, uint8_t taps) {
-    // set complete if it should be set complete.
-    switch (index) {
-        case ZERO_SYM:
-            if (!my_tap_held) {
-                if ((my_taps[ZERO_SYM].action_mask & ONE_TAP_HOLDABLE) == 0) {
-                    if (taps == 1) {        // this differentiation is not clean...
-                        layer_invert(_SYM); // you have to handle the swap in AND swap out
-                                            //
-                                            // this might result in always a quick extra tap at the end of repeatables.
-                    } else {                // taps == 2
-                        tap_code(KC_0);
-                    }
-                }
-                return true;
-            }
+	// set complete if it should be set complete.
+	switch (index) {
+		case ZERO_SYM:
+			if (!my_tap_held) {
+				if (taps == 1) {        // this differentiation is not clean...
+					layer_invert(_SYM); // you have to handle the swap in AND swap out
 
-            // for repeatable task taps and holds:
-            if ((my_taps[ZERO_SYM].action_mask & ONE_TAP_REPEATABLE) || (my_taps[ZERO_SYM].action_mask & TWO_TAP_REPEATABLE)) {
-               if (repeat_tap_action()) {
-                    if (taps == 1) {
-                        // Layer change is not repeatable, however
-                        // It should do MT(SYM_Layer) until released.
-                        // This doesn't work since 0 is repeatable but SYM toggle is not.
-					} else { // taps == 2
-                        tap_code(KC_0);
-                    }
-                }
-                return false;
-            } else { // a non-repeatable, fire on hold key.
-					 mod_active = true;
-                     layer_on(_SYM);//will it repeat?
-                return true;
-            }
+				} else {                // taps == 2
+					tap_code(KC_0);
+				}
+				return true;
+			}
 
-            // for hold tasks:
-            // probably don't have to do anything, just handle it in release.
-    }
-
-    return false;
+			// for repeatable tasks
+			if (taps == 2) {
+				if (repeat_tap_action()) {
+					tap_code(KC_0);
+				}
+				return false;
+			}
+	}
+	return false;
 }
 
 void do_my_taps_release_action(uint8_t index, uint8_t taps) {
-    if ((taps == 1) && (my_taps[index].action_mask & ONE_TAP_ON_RELEASE)) {
-        // do the action that corresponds to the one tap on release;
-		layer_off(_SYM);
-		mod_active = false;
-        clean_up_taps();
-        return;
-    }
-    if ((taps == 2) && (my_taps[index].action_mask & TWO_TAP_ON_RELEASE)) {
-        // do the action that corresponds to double tap on release;
-		mod_active = false;
-        clean_up_taps();
-        return;
-    }
+	switch (index) {
+		case ZERO_SYM:
+			if (mod_active) {
+				layer_off(_SYM);
+			}
+	}
+
+  //   if ((taps == 1) && (my_taps[index].action_mask & ONE_TAP_ON_RELEASE)) {
+  //       // do the action that corresponds to the one tap on release;
+		// layer_off(_SYM);
+		// mod_active = false;
+  //       clean_up_taps();
+  //       return;
+  //   }
+  //   if ((taps == 2) && (my_taps[index].action_mask & TWO_TAP_ON_RELEASE)) {
+  //       // do the action that corresponds to double tap on release;
+		// mod_active = false;
+  //       clean_up_taps();
+  //       return;
+  //   }
 }
 
 // static void default_cleanup() {
@@ -118,3 +119,45 @@ uint8_t keycode_to_my_tap(uint16_t keycode) {
             return 255;
     }
 }
+
+
+
+
+
+//CONVOLUTED VERSION
+// case ZERO_SYM:
+//             if (!my_tap_held) {
+//                 if ((my_taps[ZERO_SYM].action_mask & ONE_TAP_HOLDABLE) == 0) {
+//                     if (taps == 1) {        // this differentiation is not clean...
+//                         layer_invert(_SYM); // you have to handle the swap in AND swap out
+//                                             //
+//                                             // this might result in always a quick extra tap at the end of repeatables.
+//                     } else {                // taps == 2
+//                         tap_code(KC_0);
+//                     }
+//                 }
+//                 return true;
+//             }
+//
+//             // for repeatable task taps and holds:
+//             if ((my_taps[ZERO_SYM].action_mask & ONE_TAP_REPEATABLE) || (my_taps[ZERO_SYM].action_mask & TWO_TAP_REPEATABLE)) {
+//                if (repeat_tap_action()) {
+//                     if (taps == 1) {
+//                         // Layer change is not repeatable, however
+//                         // It should do MT(SYM_Layer) until released.
+//                         // This doesn't work since 0 is repeatable but SYM toggle is not.
+// 					} else { // taps == 2
+//                         tap_code(KC_0);
+//                     }
+//                 }
+//                 return false;
+//             } else { // a non-repeatable, fire on hold key.
+// 					 mod_active = true;
+//                      layer_on(_SYM);//will it repeat?
+//                 return true;
+//             }
+//
+//             // for hold tasks:
+//             // probably don't have to do anything, just handle it in release.
+//     }
+
