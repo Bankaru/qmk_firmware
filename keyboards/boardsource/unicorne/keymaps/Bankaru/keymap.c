@@ -52,11 +52,11 @@ float tone_exit[][2]  = SONG(MUSIC_ON_SOUND);
 #define MY_SHFT MT(MOD_LSFT, KC_CAPS)
 
 
-
 //tap dance
 enum {
 	TD_0,
 	TD_UNDS,
+	TD_SHFT,
 #ifdef VIM_MOTIONS
 	TD_VI_Y,
 #endif
@@ -64,7 +64,8 @@ enum {
 
 tap_dance_action_t tap_dance_actions[] = {
 	[TD_0] = ACTION_TAP_DANCE_DOUBLE(MY_SYM, KC_0),
-	[TD_UNDS] = ACTION_TAP_DANCE_DOUBLE(KC_LGUI, KC_UNDS),
+	[TD_UNDS] = ACTION_TAP_DANCE_DOUBLE(KC_UNDS, KC_LGUI),
+	[TD_SHFT] = ACTION_TAP_DANCE_DOUBLE(MOD_LSFT, KC_CAPS),
 #ifdef VIM_MOTIONS
 	[TD_VI_Y] = ACTION_TAP_DANCE_FN(tap_dance_VI_Y),
 #endif
@@ -145,7 +146,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 
 #ifdef MY_TAPS
-	return process_my_taps(keycode, record);
+	if (process_my_taps(keycode, record) == false) {
+		return false;
+	}
 #endif
 	
 	saved_mods = get_mods();
@@ -183,6 +186,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 return false;
             }
             return true;
+
+		case KC_ESC:
+			if (record->event.pressed) {
+				if (host_keyboard_led_state().caps_lock) {
+					tap_code(KC_CAPS);
+					return false;
+				}
+			}
+			return true;
 
         case MY_COPY:
             if (record->event.pressed) {
@@ -288,7 +300,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {[_BASE] = LAYOUT_s
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,             KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
 		KC_ESC,  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,             KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
 		MY_NAV,  KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,  		   KC_N, 	KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_ENT,
-								   KC_LCTL, TD(TD_UNDS), MY_SHFT,	   KC_SPC,  TP_SYM, KC_LALT),
+								   KC_LCTL,TD(TD_UNDS),MY_SHFT,	   KC_SPC,  TP_SYM, KC_LALT),
     //    [_SYM] = LAYOUT_split_3x6_3(
     // |........|........|........|........|........|........|........|........|........|........|........|........|........|........|
     //  _______, KC_LCBR, KC_LBRC, KC_LPRN, KC_PIPE, KC_PERC,          KC_CIRC, KC_AMPR, KC_RPRN, KC_RBRC, KC_RCBR, _______, 

@@ -16,7 +16,7 @@ KEY_OVERRIDE_ENABLE = yes
 TAP_DANCE_ENABLE = yes
 AUDIO_ENABLE = yes
 CONSOLE_ENABLE = yes
-
+DEBUG_ENABLE = yes
 # Additional source files for circuit effect
 #SRC += vim_motions.c
 SRC += my_taps.c

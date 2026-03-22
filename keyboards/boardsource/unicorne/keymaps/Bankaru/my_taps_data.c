@@ -1,7 +1,7 @@
 #include "my_taps_data.h"
 #include "my_taps.h"
 #include "custom_keycodes.h"
-
+#include "print.h"
 static bool repeat_tap_action(void);
 
 enum {
@@ -10,11 +10,12 @@ enum {
 
 my_tap_t my_taps[1] = {
     [ZERO_SYM] = {
-            .action_mask = 0b0001110,
+            .action_mask = 0b0011100,
         },
 };
 
-static bool repeat_started;
+bool repeat_started;
+bool mod_active;
 uint16_t my_taps_hold_timer;
 uint8_t  delay_index    = 0;
 uint16_t delay_times[2] = {
@@ -46,18 +47,19 @@ bool do_my_taps_action(uint8_t index, uint8_t taps) {
 
             // for repeatable task taps and holds:
             if ((my_taps[ZERO_SYM].action_mask & ONE_TAP_REPEATABLE) || (my_taps[ZERO_SYM].action_mask & TWO_TAP_REPEATABLE)) {
-                if (repeat_tap_action()) {
+               if (repeat_tap_action()) {
                     if (taps == 1) {
                         // Layer change is not repeatable, however
                         // It should do MT(SYM_Layer) until released.
                         // This doesn't work since 0 is repeatable but SYM toggle is not.
-                    } else { // taps == 2
+					} else { // taps == 2
                         tap_code(KC_0);
                     }
                 }
                 return false;
             } else { // a non-repeatable, fire on hold key.
-                     // tap_code(TP_SYM);
+					 mod_active = true;
+                     layer_on(_SYM);//will it repeat?
                 return true;
             }
 
@@ -71,11 +73,14 @@ bool do_my_taps_action(uint8_t index, uint8_t taps) {
 void do_my_taps_release_action(uint8_t index, uint8_t taps) {
     if ((taps == 1) && (my_taps[index].action_mask & ONE_TAP_ON_RELEASE)) {
         // do the action that corresponds to the one tap on release;
+		layer_off(_SYM);
+		mod_active = false;
         clean_up_taps();
         return;
     }
     if ((taps == 2) && (my_taps[index].action_mask & TWO_TAP_ON_RELEASE)) {
         // do the action that corresponds to double tap on release;
+		mod_active = false;
         clean_up_taps();
         return;
     }

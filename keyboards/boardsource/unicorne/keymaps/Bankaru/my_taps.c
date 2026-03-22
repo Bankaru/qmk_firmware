@@ -21,15 +21,31 @@ void clean_up_taps(){
     taps = 0;
     completed = false;
 	active_my_tap = 255;
+	repeat_started = false;
 	//set my_taps_timer = 0;  No need as long as timer_elapsed is always logically behind timer_read
 }
 
 bool process_my_taps(uint16_t keycode, keyrecord_t *record) {
 	uint8_t current_index = keycode_to_my_tap(keycode);
 	if (current_index == 255) {
+		if (taps != 0) {
+			if (!my_tap_held) {
+			do_my_taps_action(active_my_tap, taps);
+			//TODO: this won't for holding the sym key because it will clean it up.
+			//You might need a mod flag for the action mask.
+			clean_up_taps();
+			 }
+			// else if (mod_active) {
+			// 	you don't really need to do anything....
+			//  because the mod is already active.
+			// }
+		}
 		return true;
 		//It is not a my_tap key.  Continue processing in process_record_user
+		//That said, if another key is pressed here, it should immediately fire any taps
+		//that are waiting and clean up taps before.  But holds should stay... 
 	}
+
 
 	if (record->event.pressed) {
 		// send a code quickly if you tap a button and then quickly press a different button.
@@ -63,11 +79,21 @@ bool process_my_taps(uint16_t keycode, keyrecord_t *record) {
 	else {
 		//i may not need this, cause you reset taps to 0;
 		//well, i think need it for the second one.
-		if (timer_elapsed(my_taps_timer) > TAPPING_TERM) {
-			//hold confirmed;
+
+		if (mod_active) {
+			//for do-while-held stuff.
+			do_my_taps_release_action(current_index, taps);
+		} 
+		else if (timer_elapsed(my_taps_timer) > TAPPING_TERM) {
+			//for do-after-hold stuff.
 			do_my_taps_release_action(current_index, taps);
 		}
-
+		
+		//you might need to start counting taps from the release so that the hold
+		//can happen while held, and then the tap can happen if it released before
+		//the tapping term?
+		//Then double tap happens if it is released again before another tapping term?
+		//So potentially waiting 2 tapping terms.
 		my_tap_held = false;
 		
 		//is there any thing you want to do here for on release?
