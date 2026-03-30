@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "keycodes.h"
 #include "custom_keycodes.h"
 #include "keymap_us.h"
@@ -54,7 +55,7 @@ float tone_exit[][2]  = SONG(MUSIC_ON_SOUND);
 
 //tap dance
 enum {
-	TD_0,
+	//TD_0,
 	TD_UNDS,
 	TD_SHFT,
 #ifdef VIM_MOTIONS
@@ -63,7 +64,7 @@ enum {
 };
 
 tap_dance_action_t tap_dance_actions[] = {
-	[TD_0] = ACTION_TAP_DANCE_DOUBLE(MY_SYM, KC_0),
+	//[TD_0] = ACTION_TAP_DANCE_DOUBLE(MY_SYM, KC_0),
 	[TD_UNDS] = ACTION_TAP_DANCE_DOUBLE(KC_UNDS, KC_LGUI),
 	[TD_SHFT] = ACTION_TAP_DANCE_DOUBLE(MOD_LSFT, KC_CAPS),
 #ifdef VIM_MOTIONS
@@ -80,11 +81,17 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 
-const uint16_t PROGMEM sym_space_combo[] = {MY_SYM, KC_SPC, COMBO_END};
-const uint16_t PROGMEM nav_space_combo[] = {MY_NAV, KC_SPC, COMBO_END};
+//const uint16_t PROGMEM sym_space_combo[] = {MY_SYM, KC_SPC, COMBO_END};
+//const uint16_t PROGMEM nav_space_combo[] = {MY_NAV, KC_SPC, COMBO_END};
+const uint16_t PROGMEM sym_tab_combo[] = {TP_SYM, KC_TAB, COMBO_END};
+//ideas:  combos are good for keys that don't change with the layer:
+//tab, del, enter.  not really esc i guess...
+//sym_del_combo.  sym_enter_combo. nav_enter_combo. nav_del_combo.
+//You might want an easier \ button.
 combo_t key_combos[] = {
-    COMBO(sym_space_combo, KC_UNDS),
-    COMBO(nav_space_combo, KC_TAB),
+    //COMBO(sym_space_combo, KC_UNDS),
+    //COMBO(nav_space_combo, KC_TAB),
+	COMBO(sym_tab_combo, KC_TILD), 
 };
 
 const key_override_t shift_0 = ko_make_basic(MOD_MASK_SHIFT, KC_0, KC_KP_0);
@@ -309,7 +316,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {[_BASE] = LAYOUT_s
 	//								_______, _______, _______,          _______, _______, _______),
         [_SYM] = LAYOUT_split_3x6_3(
     // |........|........|........|........|........|........|........|........|........|........|........|........|........|........|
-        _______, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,          KC_AMPR, KC_7,    KC_8,    KC_9,   S(KC_GRV), _______, //maybe make GRV a new keycode with tilde as default, shift = KC_GRV
+        _______, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,          KC_AMPR, KC_7,    KC_8,    KC_9,   S(KC_GRV), _______, //Tilde is now a combo, you can put GRV as default or pipe or backslash.
 	  	MY_BASE, KC_LCBR, KC_LPRN, KC_RPRN, KC_RCBR,S(KC_BSLS),	  	   KC_SLSH, KC_4,    KC_5,    KC_6,    KC_MINS, KC_EQL,  //maybe make BSLS have PIPE as default
 	  	_______, KC_LABK, KC_LBRC, KC_RBRC, KC_RABK, KC_CIRC, 		   KC_ASTR, KC_1,    KC_2,    KC_3,    KC_PLUS, _______, 
 	  								_______, _______, _______,         _______, KC_0, _______),
@@ -339,8 +346,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {[_BASE] = LAYOUT_s
 #endif
         [_NVSY] = LAYOUT_split_3x6_3(
     // |........|........|........|........|........|........|........|........|........|........|........|........|........|........|
-        _______, _______, _______, _______, _______, _______, 		   _______, _______, _______, KC_PGUP, _______, _______,
-		MY_BASE, _______, _______, _______, XXXXXXX, _______,          _______, _______, KC_HOME, KC_PGDN, KC_END,  _______,
+        _______, _______, _______, _______, _______, _______, 		   _______, _______, KC_PGUP, _______, _______, _______,
+		MY_BASE, _______, _______, _______, XXXXXXX, _______,          _______, KC_HOME, KC_PGDN, KC_END,  _______, _______,
 		KC_END, _______, _______, _______, _______, _______,           _______, _______, _______, _______, _______, _______,
 	                              _______, _______, _______,           _______, _______, _______),
         [_SYST] = LAYOUT_split_3x6_3(
